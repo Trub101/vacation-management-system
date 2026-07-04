@@ -5,7 +5,7 @@ them, get AI travel recommendations, and query the database in plain English via
 custom **MCP** server. Admins can add/edit/delete vacations and view a likes report
 with charts and CSV export.
 
-> **GitHub:** _add your repository URL here_
+> **GitHub:** https://github.com/Trub101/vacation-management-system
 
 ---
 
