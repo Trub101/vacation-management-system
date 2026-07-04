@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "Vacation Management System API",
+    "description": "Full API for the Vacation Management System. Set {{baseUrl}} (default http://localhost:4000). Run 'Login (admin)' or 'Login (user)' first — they save {{token}} automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"New\",\n  \"last_name\": \"User\",\n  \"email\": \"new.user@test.com\",\n  \"password\": \"pass123\"\n}" }
+          }
+        },
+        {
+          "name": "Login (admin)",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const j = pm.response.json();", "if (j.token) pm.collectionVariables.set('token', j.token);"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"admin123\"\n}" }
+          }
+        },
+        {
+          "name": "Login (user)",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const j = pm.response.json();", "if (j.token) pm.collectionVariables.set('token', j.token);"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@test.com\",\n  \"password\": \"user123\"\n}" }
+          }
+        },
+        {
+          "name": "Check email availability",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/auth/check-email?email=free@test.com", "host": ["{{baseUrl}}"], "path": ["api", "auth", "check-email"], "query": [{ "key": "email", "value": "free@test.com" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vacations",
+      "item": [
+        {
+          "name": "List vacations (filter + pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vacations?filter=all&page=1&limit=9", "host": ["{{baseUrl}}"], "path": ["api", "vacations"], "query": [{ "key": "filter", "value": "all" }, { "key": "page", "value": "1" }, { "key": "limit", "value": "9" }] }
+          }
+        },
+        {
+          "name": "Get vacation by id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vacations/1", "host": ["{{baseUrl}}"], "path": ["api", "vacations", "1"] }
+          }
+        },
+        {
+          "name": "Add vacation (admin, multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vacations", "host": ["{{baseUrl}}"], "path": ["api", "vacations"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "destination", "value": "Lisbon, Portugal", "type": "text" },
+                { "key": "description", "value": "Sunny hills, trams and pastel de nata.", "type": "text" },
+                { "key": "start_date", "value": "2026-09-01", "type": "text" },
+                { "key": "end_date", "value": "2026-09-10", "type": "text" },
+                { "key": "price", "value": "1799.99", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit vacation (admin, multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vacations/1", "host": ["{{baseUrl}}"], "path": ["api", "vacations", "1"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "destination", "value": "Paris, France", "type": "text" },
+                { "key": "description", "value": "Updated description.", "type": "text" },
+                { "key": "start_date", "value": "2026-05-01", "type": "text" },
+                { "key": "end_date", "value": "2026-05-12", "type": "text" },
+                { "key": "price", "value": "2250.00", "type": "text" },
+                { "key": "image", "type": "file", "src": [], "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete vacation (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vacations/99", "host": ["{{baseUrl}}"], "path": ["api", "vacations", "99"] }
+          }
+        },
+        {
+          "name": "Likes report (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/vacations/reports/likes", "host": ["{{baseUrl}}"], "path": ["api", "vacations", "reports", "likes"] }
+          }
+        },
+        {
+          "name": "Serve image (public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/vacations/images/paris.jpg", "host": ["{{baseUrl}}"], "path": ["api", "vacations", "images", "paris.jpg"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Likes",
+      "item": [
+        {
+          "name": "Add like (user)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/likes/2", "host": ["{{baseUrl}}"], "path": ["api", "likes", "2"] }
+          }
+        },
+        {
+          "name": "Remove like (user)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/likes/2", "host": ["{{baseUrl}}"], "path": ["api", "likes", "2"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI & MCP",
+      "item": [
+        {
+          "name": "AI recommendation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/ai/recommend", "host": ["{{baseUrl}}"], "path": ["api", "ai", "recommend"] },
+            "body": { "mode": "raw", "raw": "{\n  \"destination\": \"Kyoto, Japan\"\n}" }
+          }
+        },
+        {
+          "name": "MCP query",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/mcp/query", "host": ["{{baseUrl}}"], "path": ["api", "mcp", "query"] },
+            "body": { "mode": "raw", "raw": "{\n  \"question\": \"How many vacations are active right now and what is the average price?\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api", "health"] }
+      }
+    }
+  ]
+}

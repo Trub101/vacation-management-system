@@ -1,0 +1,53 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: vacations_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: vacations_db
+    ports:
+      - "3307:3306"        # host 3307 to avoid clashing with a local MySQL on 3306
+    volumes:
+      - ./Database/vacations_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./Backend
+    container_name: vacations_backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_NAME: vacations_db
+      JWT_SECRET: change_this_in_production_jwt_secret
+      JWT_EXPIRES_IN: 3d
+      CLIENT_URL: http://localhost:3000
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./Backend/uploads:/app/uploads
+
+  frontend:
+    build: ./Frontend
+    container_name: vacations_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
